@@ -20,7 +20,8 @@ const Ajv         = require("ajv");
 const addFormats  = require("ajv-formats");
 const jsoncParser = require("jsonc-parser");
 
-const validSchemaPattern = /^https:\/\/raw\.githubusercontent\.com\/chewygumxx\/sync-repo-metadata\/refs\/tags\/v2(?:\.\d+\.\d+)?\/schema\.json$/;
+// Single source of truth: the `$schema` pattern shipped alongside this file
+const validSchemaPattern = new RegExp(require("./schema.json").properties.$schema.pattern, "u");
 
 function validURL(url) {
     try{ new URL(url); return url; } catch { return false; }

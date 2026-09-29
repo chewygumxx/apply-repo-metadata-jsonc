@@ -34,8 +34,8 @@
     },
     "owner": {
       "type": "string",
-      "description": "Repository owner (organization or user).",
-      "pattern": "^[\\w](?:[\\w]|-(?=[\\w])){0,38}$",
+      "description": "Repository owner (organization or user). ASCII alphanumerics and single hyphens, not leading or trailing; Enterprise Managed Users may carry a trailing '_<shortcode>' of 3-8 alphanumerics.",
+      "pattern": "^[A-Za-z0-9]+(-[A-Za-z0-9]+)*(_[A-Za-z0-9]{3,8})?$",
       "minLength": 1,
       "maxLength": 39,
       "examples": ["chewygumxx", "wh1zzyboy", "gigabot2114"]
@@ -45,7 +45,7 @@
       "description": "The repository slug. Format: <username>/<repository>. Each half follows the same rules as 'owner' and 'name' respectively.",
       "pattern": "^[A-Za-z0-9_-]{1,39}/[A-Za-z0-9._-]{1,100}$",
       "allOf": [
-        { "pattern": "^[A-Za-z0-9_]+(-[A-Za-z0-9_]+)*/" }
+        { "pattern": "^[A-Za-z0-9]+(-[A-Za-z0-9]+)*(_[A-Za-z0-9]{3,8})?/" }
       ],
       "not": {
         "anyOf": [

@@ -150,10 +150,10 @@
     },
     "language": {
       "type": "string",
-      "description": "Primary language of the repository functional content.",
+      "description": "Primary language of the repository functional content, preferably its GitHub Linguist name (e.g. 'C#', 'Emacs Lisp') or alias. Must start with an alphanumeric, '#', or '+', and must not end with whitespace or punctuation other than '#', '+', ')', or '*'.",
       "minLength": 1,
       "maxLength": 50,
-      "pattern": "^[\\w._+-]{1,50}$",
+      "pattern": "^[A-Za-z0-9#+]([ A-Za-z0-9#+'().*/-]*[A-Za-z0-9#+)*])?$",
       "examples": ["zsh", "rust", "lua", "bash", "c", "javascript"]
     },
     "visibility": {

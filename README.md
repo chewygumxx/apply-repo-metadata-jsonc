@@ -24,6 +24,11 @@ The metadata file is validated against the [JSON Schema](<./schema.json>)
 fetched at runtime from its own `$schema` field. `$schema` may reference either
 the floating major-version tag (`v2`) or an exact release tag (`v2.0.0`).
 
+The action refuses a metadata file whose `slug` names another repository,
+ignoring case, so a file copied from another repository or left over from a
+rename cannot apply that repository's settings. A file without `slug` is not
+checked.
+
 ## Usage
 
 ```yaml

@@ -61,7 +61,16 @@
       "type": "string",
       "minLength": 1,
       "maxLength": 100,
-      "description": "Default branch name",
+      "description": "Default branch name. Must be a valid Git branch name (see git-check-ref-format(1)).",
+      "pattern": "^[^\\x00-\\x20\\x7f~^:?*\\[\\\\]+$",
+      "not": {
+        "anyOf": [
+          { "enum": ["HEAD"] },
+          { "pattern": "^[-/]|/$|//" },
+          { "pattern": "\\.\\.|@\\{" },
+          { "pattern": "(^|/)\\.|\\.lock(/|$)|\\.$" }
+        ]
+      },
       "examples": ["main", "master"]
     },
     "description": {

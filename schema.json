@@ -88,10 +88,10 @@
         },
         "spdx_id": {
           "type": "string",
-          "description": "License identifier according to https://spdx.org/licenses/",
-          "pattern": "^[\\w](?:[\\w]|-(?=[\\w])|\\.(?=[\\w])){2,36}$",
-          "minLength": 3,
-          "maxLength": 37,
+          "description": "License identifier according to https://spdx.org/licenses/, or a custom 'LicenseRef-' identifier. ASCII alphanumerics separated by single '.' or '-', with an optional trailing '+'.",
+          "pattern": "^[A-Za-z0-9]+([.-][A-Za-z0-9]+)*\\+?$",
+          "minLength": 2,
+          "maxLength": 100,
           "examples": ["GPL-3.0-only", "MIT", "CC-BY-3.0"]
         },
         "full_name": {

@@ -141,10 +141,10 @@
       "maxItems": 20,
       "items": {
         "type": "string",
-        "description": "Only alphanumerics and hyphens, all lowercase, must start with an alphanumeric, and no consecutive hyphens.",
+        "description": "Per GitHub topic rules: only lowercase alphanumerics and hyphens, must start with an alphanumeric, 50 characters or less.",
         "minLength": 1,
         "maxLength": 50,
-        "pattern": "^[a-z0-9](?:[a-z0-9]|-(?=[a-z0-9])){0,49}$",
+        "pattern": "^[a-z0-9][a-z0-9-]*$",
         "examples": ["metadata", "media", "formatter", "config"]
       }
     },

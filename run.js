@@ -69,6 +69,18 @@ function envParse(env) {
         process.exit(1);
     }
 
+    // A metadata file copied from another repository, or left over from a
+    // rename, would otherwise apply that repository's settings here.
+    if (
+        metadata.slug !== undefined &&
+        String(metadata.slug).toLowerCase() !== slug.toLowerCase()
+    ) {
+        console.error(
+            `[FATAL] ${metadataPath} describes ${metadata.slug}, but this is ${slug}`
+        );
+        process.exit(1);
+    }
+
     return {
         ghAPIURL:    ghAPIURL,
         token:       token,

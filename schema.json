@@ -20,8 +20,14 @@
     },
     "name": {
       "type": "string",
-      "description": "Short repository identifier, preferably lowercase.",
-      "pattern": "^[\\w](?:[\\w]|-(?=[\\w])|.(?=[\\w])){0,99}$",
+      "description": "Short repository identifier, preferably lowercase. ASCII alphanumerics, '.', '-', and '_' only; must not be '.' or '..', nor end in '.git' or '.wiki' (case-insensitive).",
+      "pattern": "^[A-Za-z0-9._-]{1,100}$",
+      "not": {
+        "anyOf": [
+          { "enum": [".", ".."] },
+          { "pattern": "\\.([Gg][Ii][Tt]|[Ww][Ii][Kk][Ii])$" }
+        ]
+      },
       "minLength": 1,
       "maxLength": 100,
       "examples": ["dotfiles", "schema", "cloudflare-ddns"]
@@ -36,8 +42,17 @@
     },
     "slug": {
       "type": "string",
-      "description": "The repository slug. Format: <username>/<repository>",
-      "pattern": "^[\\w](?:[\\w]|-(?=[\\w])){0,38}/[\\w](?:[\\w]|-(?=[\\w])){0,99}$",
+      "description": "The repository slug. Format: <username>/<repository>. Each half follows the same rules as 'owner' and 'name' respectively.",
+      "pattern": "^[A-Za-z0-9_-]{1,39}/[A-Za-z0-9._-]{1,100}$",
+      "allOf": [
+        { "pattern": "^[A-Za-z0-9_]+(-[A-Za-z0-9_]+)*/" }
+      ],
+      "not": {
+        "anyOf": [
+          { "pattern": "/\\.{1,2}$" },
+          { "pattern": "\\.([Gg][Ii][Tt]|[Ww][Ii][Kk][Ii])$" }
+        ]
+      },
       "minLength": 3,
       "maxLength": 140,
       "examples": ["chewygumxx/dotfiles", "fairyglade/ly", "hyprwm/Hyprland"]

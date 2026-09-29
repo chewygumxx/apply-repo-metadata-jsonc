@@ -12,7 +12,7 @@
     "$schema": {
       "type": "string",
       "description": "Identifying HTTPS URL of the governing JSONschema. Must reference either the floating major-version tag (e.g. v2) or an exact, immutable release tag under it (e.g. v2.0.0).",
-      "pattern": "^https://raw\\.githubusercontent\\.com/chewygumxx/sync-repo-metadata/refs/tags/v2(?:\\.\\d+\\.\\d+)?/schema\\.json$",
+      "pattern": "^https://raw\\.githubusercontent\\.com/chewygumxx/sync-repo-metadata/refs/tags/v2(\\.[0-9]+\\.[0-9]+)?/schema\\.json$",
       "examples": [
         "https://raw.githubusercontent.com/chewygumxx/sync-repo-metadata/refs/tags/v2/schema.json",
         "https://raw.githubusercontent.com/chewygumxx/sync-repo-metadata/refs/tags/v2.0.0/schema.json"

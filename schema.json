@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://raw.githubusercontent.com/chewygumxx/sync-repo-metadata/refs/tags/v2.0.0/schema.json",
+  "$id": "https://raw.githubusercontent.com/chewygumxx/sync-repo-metadata/refs/tags/v2.2.0/schema.json",
 
   "title": "Repository metadata",
   "description": "Governs the '.repo-metadata.jsonc' file at the root of a given repository.",

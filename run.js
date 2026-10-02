@@ -20,8 +20,19 @@ const Ajv         = require("ajv");
 const addFormats  = require("ajv-formats");
 const jsoncParser = require("jsonc-parser");
 
-// Single source of truth: the `$schema` pattern shipped alongside this file
-const validSchemaPattern = new RegExp(require("./schema.json").properties.$schema.pattern, "u");
+// Single source of truth: the schema shipped alongside this file. Its `$schema`
+// pattern gates which metadata files are accepted, and its `$id` names the
+// release this code belongs to.
+const bundledSchema      = require("./schema.json");
+const validSchemaPattern = new RegExp(bundledSchema.properties.$schema.pattern, "u");
+
+// e.g. .../refs/tags/v2.2.0/schema.json -> .../refs/tags/v2/schema.json
+const idParts = /^(.*\/refs\/tags\/)(v[0-9]+)\.[0-9]+\.[0-9]+(\/schema\.json)$/u.exec(bundledSchema.$id);
+if (!idParts) throw new Error(`Bundled schema.json has a malformed $id: ${bundledSchema.$id}`);
+const ownSchemaURL   = bundledSchema.$id;
+const majorSchemaURL = idParts[1] + idParts[2] + idParts[3];
+
+const schemaFetchTimeoutMs = 10000;
 
 function validURL(url) {
     try{ new URL(url); return url; } catch { return false; }
@@ -90,26 +101,60 @@ function envParse(env) {
     };
 }
 
+async function resolveSchema(url) {
+    // The major tag and this release both resolve to the schema this code was
+    // written against, so no network access is needed
+    if (url === majorSchemaURL || url === ownSchemaURL) {
+        console.log("[INFO] Using bundled metadata JSONschema:", ownSchemaURL);
+        return bundledSchema;
+    }
+
+    // Any other exact release: fetch it
+    console.log("[INFO] Fetching metadata JSONschema:", url);
+    let response, text;
+    try {
+        response = await fetch(url, { signal: AbortSignal.timeout(schemaFetchTimeoutMs) });
+        text     = await response.text();
+    } catch (err) {
+        throw new Error([
+            "Failed to fetch metadata JSONschema:",
+            `.repo-metadata.jsonc -> $schema: ${url}`,
+            err.message || String(err)
+        ].join('\n'), { cause: err });
+    }
+    let schema;
+    try { schema = text ? JSON.parse(text) : null; } catch { schema = text; }
+    if (!response.ok) throw new Error([
+        "Error returned when fetching metadata JSONschema:",
+        `.repo-metadata.jsonc -> $schema: ${url}`,
+        `HTTP GET Response: [${response.status}] ${response.statusText}`,
+        fmt(schema)
+    ].join('\n'));
+    if (schema === null || typeof schema !== 'object' || Array.isArray(schema)) throw new Error([
+        "Fetched metadata JSONschema is not a JSON object:",
+        `.repo-metadata.jsonc -> $schema: ${url}`,
+        fmt(schema).slice(0, 500)
+    ].join('\n'));
+
+    // v2.0.1 and v2.1.0 shipped with a stale `$id`, and their tags are
+    // immutable, so a mismatch is only worth a warning
+    if (schema.$id !== url) console.warn(
+        `[WARNING] Fetched metadata JSONschema identifies itself as ${schema.$id}, not ${url}`
+    );
+
+    return schema;
+}
+
 async function metaParse(meta, metadataDir) {
     // Validate JSONSchema URL
     if (!validSchemaPattern.test(meta.$schema)) throw new Error(
         `Failed to validate URL of metadata JSONschema: ${meta.$schema}\n` +
         `Must match: ${validSchemaPattern.source}\n` +
-        "e.g. https://raw.githubusercontent.com/chewygumxx/sync-repo-metadata/refs/tags/v2/schema.json\n" +
-        "  or https://raw.githubusercontent.com/chewygumxx/sync-repo-metadata/refs/tags/v2.0.0/schema.json"
+        `e.g. ${majorSchemaURL}\n` +
+        `  or ${ownSchemaURL}`
     );
 
-    // Fetch JSONschema
-    const response = await fetch(meta.$schema);
-    const text = await response.text();
-    let schema;
-    try { schema = text ? JSON.parse(text) : null; } catch { schema = text; }
-    if (!response.ok) throw new Error([ 
-        "Error returned when fetching metadata JSONschema:",
-        `.repo-metadata.jsonc -> $schema: ${meta.$schema}`,
-        `HTTP GET Response: [${response.status}] ${response.statusText}`,
-        fmt(schema)
-    ].join('\n'));
+    const schema = await resolveSchema(meta.$schema);
 
     // Validate
     const ajv      = new Ajv();

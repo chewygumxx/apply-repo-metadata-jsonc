@@ -25,15 +25,15 @@ inputs:
 runs:
     using: composite
     steps:
-        - name: Initialise Node.js
-          uses: actions/setup-node@v7
+        - name: Initialise Bun
+          uses: oven-sh/setup-bun@v2
           with:
-              node-version: '24'
+              bun-version: '1.4'
 
         - name: Install Dependencies
           shell: bash
           run: |
-              npm ci --omit=dev --prefix "$GITHUB_ACTION_PATH"
+              bun install --production --frozen-lockfile --cwd "$GITHUB_ACTION_PATH"
 
         - name: Apply Metadata
           shell: bash
@@ -43,4 +43,4 @@ runs:
               GITHUB_REPOSITORY: ${{ github.repository }}
               METADATA_PATH:     ${{ inputs.metadata_path }}
           run: |
-              node "$GITHUB_ACTION_PATH/run.js"
+              bun "$GITHUB_ACTION_PATH/run.js"

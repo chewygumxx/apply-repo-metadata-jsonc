@@ -133,11 +133,11 @@ reset to a default. A boolean explicitly set to `false` is still sent.
 ## Development
 
 ```sh
-npm install
-npx eslint .   # lint (flat config in eslint.config.mjs)
+bun install
+bunx eslint .  # lint (flat config in eslint.config.mjs)
 ```
 
-There is no build step; `run.js` runs directly under Node.js. To run the
+There is no build step; `run.js` runs directly under Bun. To run the
 action's logic locally:
 
 ```sh
@@ -145,7 +145,7 @@ action's logic locally:
 GITHUB_TOKEN=token \
 GITHUB_REPOSITORY=owner/repo \
 GITHUB_API_URL=https://api.github.com \
-node run.js
+bun run.js
 ```
 
 `METADATA_PATH` may also be set to override the default `.repo-metadata.jsonc`

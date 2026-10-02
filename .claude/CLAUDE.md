@@ -4,18 +4,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A composite GitHub Action (`action.yaml`) that reads `.repo-metadata.jsonc` from the consuming repo and pushes repository settings — `description`, `homepage`, topics, visibility, merge/branch options, feature toggles, and immutable releases — to GitHub via the REST API. The entire implementation is `run.js`; there is no build step — it runs directly under Node.js.
+A composite GitHub Action (`action.yaml`) that reads `.repo-metadata.jsonc` from the consuming repo and pushes repository settings — `description`, `homepage`, topics, visibility, merge/branch options, feature toggles, and immutable releases — to GitHub via the REST API. The entire implementation is `run.js`; there is no build step — it runs directly under Bun.
 
 ## Commands
 
-- Install dependencies: `npm install`
-- Lint: `npx eslint .` (flat config in `eslint.config.mjs`; no `lint` script is defined in `package.json`)
+- Install dependencies: `bun install`
+- Lint: `bunx eslint .` (flat config in `eslint.config.mjs`; no `lint` script is defined in `package.json`)
 - No test suite exists.
-- Run the action's logic locally: `node run.js`, with `GITHUB_TOKEN`, `GITHUB_REPOSITORY`, `GITHUB_API_URL` (e.g. `https://api.github.com`), and optionally `METADATA_PATH` set in the environment (see Runtime flow below).
+- Run the action's logic locally: `bun run.js`, with `GITHUB_TOKEN`, `GITHUB_REPOSITORY`, `GITHUB_API_URL` (e.g. `https://api.github.com`), and optionally `METADATA_PATH` set in the environment (see Runtime flow below).
 
 ## Architecture
 
-Single-file Node script (`run.js`) invoked by `action.yaml` as the composite action's only real step, run as `node "$GITHUB_ACTION_PATH/run.js"` (after `actions/setup-node@v7` with Node.js 24 and `npm ci --omit=dev --prefix "$GITHUB_ACTION_PATH"`). Flow in `main()`:
+Single-file Bun script (`run.js`) invoked by `action.yaml` as the composite action's only real step, run as `bun "$GITHUB_ACTION_PATH/run.js"` (after `oven-sh/setup-bun@v2` with Bun 1.4 and `bun install --production --frozen-lockfile --cwd "$GITHUB_ACTION_PATH"`). Flow in `main()`:
 
 1. **`envParse(env)`** — reads `GITHUB_API_URL` (required, must be a valid URL — no inline default; `action.yaml` supplies it from `github.api_url` so it works on GitHub Enterprise Server too), `GITHUB_TOKEN`, `GITHUB_REPOSITORY`, and `METADATA_PATH` (default `.repo-metadata.jsonc`, resolved against the working directory) from `process.env`. Exits `0` if no metadata file is present (this is treated as a no-op, not an error); exits `1` on missing/invalid required env vars or JSONC parse errors. Parses the metadata file with `jsonc-parser` and returns `{ ghAPIURL, token, slug, metadata, metadataDir }`.
 2. **`metaParse(meta, metadataDir)`** — requires `meta.$schema` to match `validSchemaPattern`, which `run.js` builds from the `$schema` property's `pattern` in the local `schema.json` (the rolling major tag, e.g. `v2`, or any exact release under it, e.g. `v2.0.0`; anything else is rejected, including otherwise-valid URLs), fetches that JSON Schema over HTTP (so validation uses the schema at the referenced tag, not the local `schema.json`), compiles it with `ajv` + `ajv-formats`, and validates the metadata object against it. If `license.filepath` is set, it must resolve (relative to `metadataDir`) to an existing file. Throws on any failure (`main()` exits `1`). Returns only the fields GitHub's API accepts: `description`, `homepage`, `topics`, `immutable_releases`, and the rest of the repository-settings fields (`visibility`, `archived`, `is_template`, `has_issues`, `has_projects`, `has_wiki`, `has_pull_requests`, `allow_forking`, the `allow_*_merge`/`delete_branch_on_merge`/`allow_update_branch` merge options, the `squash_merge_commit_*`/`merge_commit_*` enums, and `web_commit_signoff_required`) passed through as-is (`undefined` when absent from the metadata file, so unset keys are simply omitted rather than reset to a default).

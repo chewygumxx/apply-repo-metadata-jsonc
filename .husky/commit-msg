@@ -9,4 +9,4 @@
 #
 #
 
-npx --no -- commitlint --edit "$1"
+bunx --bun --no-install commitlint --edit "$1"

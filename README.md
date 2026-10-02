@@ -21,8 +21,11 @@ visibility, merge/branch options, feature toggles, and immutable releases to
 GitHub via the REST API.
 
 The metadata file is validated against the [JSON Schema](<./schema.json>)
-fetched at runtime from its own `$schema` field. `$schema` may reference either
-the floating major-version tag (`v2`) or an exact release tag (`v2.0.0`).
+named by its own `$schema` field. `$schema` may reference either the floating
+major-version tag (`v2`) or an exact release tag (`v2.0.0`). The major tag, and
+the exact tag of the action release in use, resolve to the schema bundled with
+the action, so validation needs no network access and always matches the code
+applying the settings. Any other exact tag is fetched at runtime.
 
 The action refuses a metadata file whose `slug` names another repository,
 ignoring case, so a file copied from another repository or left over from a

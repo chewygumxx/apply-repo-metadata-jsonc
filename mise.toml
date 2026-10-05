@@ -1,0 +1,22 @@
+# vim:set expandtab shiftwidth=4 filetype=toml:
+# SPDX-License-Identifier: GPL-3.0-only
+#:schema https://mise.jdx.dev/schema/mise.json
+
+#
+#
+# ~chewygumxx/sync-repo-metadata.git
+# ::: :/mise.toml
+#
+#
+
+#
+# https://mise.jdx.dev/configuration.html
+#
+# Bun installs the commit tooling in `package.json`. CI's commitlint job
+# installs from this file via `jdx/mise-action`, so it runs the same Bun.
+#
+
+min_version = "2026.9.0"
+
+[tools]
+bun = "1.4"

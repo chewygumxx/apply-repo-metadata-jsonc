@@ -8,20 +8,6 @@
 //
 //
 
-import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-import { dirname, join } from "node:path";
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const meteor = JSON.parse(readFileSync(join(__dirname, ".meteor.json"), "utf8"));
-
-export default {
-    extends: ["@commitlint/config-conventional"],
-    rules: {
-        "type-enum": [2, "always", meteor.prefixes.map((p) => p.type)],
-        "header-max-length": [2, "always", meteor.commitTitleCharLimit],
-        "body-max-line-length": [2, "always", meteor.commitBodyLineLength],
-        "scope-enum": meteor.allowCustomScopes ? [0] : [2, "always", meteor.scopes],
-        "subject-case": [2, "always", "sentence-case"],
-    },
-};
+// The house rules from @chewygumxx/commitlint-config. `.meteor.json` still
+// lists the commit prompt's choices, every one of which these rules accept.
+export { default } from "@chewygumxx/commitlint-config";

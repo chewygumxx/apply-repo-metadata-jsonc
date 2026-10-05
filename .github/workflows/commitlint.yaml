@@ -21,9 +21,12 @@ permissions:
     pull-requests: read
 
 jobs:
+    # Installs this repository's packages and runs its own commitlint, so
+    # the rules are @chewygumxx/commitlint-config's, as the commit-msg hook
+    # applies them.
     commitlint:
-        name:    Lint Commit Messages
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v7
-            - uses: wagoid/commitlint-github-action@v6
+        name: Lint Commit Messages
+        permissions:
+            contents: read
+            pull-requests: read
+        uses: chewygumxx/.github/.github/workflows/commitlint.yaml@v1
